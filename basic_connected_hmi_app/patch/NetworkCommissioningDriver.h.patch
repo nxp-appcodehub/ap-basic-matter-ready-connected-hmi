@@ -1,0 +1,14 @@
+diff --git a/src/platform/nxp/common/NetworkCommissioningDriver.h b/src/platform/nxp/common/NetworkCommissioningDriver.h
+index 7d10fbb0f2..e5658afdc8 100644
+--- a/src/platform/nxp/common/NetworkCommissioningDriver.h
++++ b/src/platform/nxp/common/NetworkCommissioningDriver.h
+@@ -71,6 +71,9 @@ public:
+     Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
+     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
+ 
++    Status GetNetworkSSID(char * ssid);
++    Status GetNetworkPassword(char * credentials);
++
+     // WiFiDriver
+     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                               uint8_t & outNetworkIndex) override;

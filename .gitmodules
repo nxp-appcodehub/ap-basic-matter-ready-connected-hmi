@@ -1,0 +1,4 @@
+[submodule "matter"]
+	path = matter
+    url = https://github.com/NXP/matter.git
+	branch = v1.0.0.2-tag-nxp

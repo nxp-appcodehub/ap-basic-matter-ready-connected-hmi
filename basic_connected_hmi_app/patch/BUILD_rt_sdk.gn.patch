@@ -1,0 +1,21 @@
+diff --git a/third_party/nxp/rt_sdk/BUILD.gn b/third_party/nxp/rt_sdk/BUILD.gn
+index 494cc7f98f..a63123e5d3 100644
+--- a/third_party/nxp/rt_sdk/BUILD.gn
++++ b/third_party/nxp/rt_sdk/BUILD.gn
+@@ -46,6 +46,16 @@ rt_sdk("nxp_sdk") {
+   sources += ["${rt_platform_dir}/board/board.c"]
+   sources += ["${rt_platform_dir}/board/peripherals.c"]
+ 
++  if (chip_enable_display) {
++    sources += [
++      "../../../../../../basic_connected_hmi_app/src/main/include/lv_conf.h",
++      "${rt_platform_dir}/board/lvgl_support.c",
++    ]
++    include_dirs += [
++      "../../../../../../basic_connected_hmi_app/src/main/include",
++    ]
++  }
++
+   #Adding pre-include files
+   cflags += ["-include" + rebase_path("${chip_root}/examples/platform/nxp/common/app/transceiver/app_matter_config.h", root_build_dir)]
+ 

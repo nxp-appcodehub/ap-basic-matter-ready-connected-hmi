@@ -1,0 +1,12 @@
+diff --git a/third_party/nxp/nxp_sdk.gni b/third_party/nxp/nxp_sdk.gni
+index 964d3a61c5..68c8fa39d7 100644
+--- a/third_party/nxp/nxp_sdk.gni
++++ b/third_party/nxp/nxp_sdk.gni
+@@ -21,6 +21,7 @@ declare_args() {
+     is_sdk_package = false
+     is_sdk_internal = false
+     use_watchdog=0
++    chip_cli_logs_same_interface = false
+ }
+ 
+ declare_args() {

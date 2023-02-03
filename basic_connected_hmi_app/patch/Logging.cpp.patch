@@ -1,0 +1,84 @@
+diff --git a/src/platform/nxp/common/Logging.cpp b/src/platform/nxp/common/Logging.cpp
+index ba94963fa7..8860c84fc1 100644
+--- a/src/platform/nxp/common/Logging.cpp
++++ b/src/platform/nxp/common/Logging.cpp
+@@ -30,6 +30,13 @@
+ #include <semphr.h>
+ #include <timers.h>
+ 
++extern "C" ssize_t serial_write(const char * buffer, size_t length);
++
++#ifdef ENABLE_CHIP_SHELL
++/* Matter logs are enabled by default */
++bool isLoggingEnabled = true;
++#endif
++
+ namespace chip {
+ namespace Logging {
+ namespace Platform {
+@@ -40,31 +47,55 @@ namespace Platform {
+  */
+ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
+ {
+-    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
++    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = {0};
+     size_t prefixLen;
+ 
+-    snprintf(formattedMsg, sizeof(formattedMsg), "[%s] ", module);
++#ifdef ENABLE_CHIP_SHELL
++    if (!isLoggingEnabled)
++    {
++        /* Return and don't print anything if isLoggingEnabled is set to false from CLI */
++        return;
++    }
++#endif
+ 
++    /* First add the timestamp to the log message */
++    snprintf(formattedMsg, sizeof(formattedMsg), "[%ld] ", xTaskGetTickCount());
+     prefixLen = strlen(formattedMsg);
+ 
+-    // Append the log message.
+-    vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, msg, v);
+-
+-    PRINTF("[%d] ", xTaskGetTickCount());
++    /* Then add log category */
+     switch (category)
+     {
+     case kLogCategory_Error:
+-        PRINTF("[ERR] ");
++        snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "%s ", "[ERR]");
+         break;
++
+     case kLogCategory_Progress:
+-        PRINTF("[INFO] ");
++        snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "%s ", "[INFO]");
+         break;
++
+     default:
+-        PRINTF("[TRACE] ");
++        snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "%s ", "[TRACE]");
+         break;
+     }
++
++    prefixLen = strlen(formattedMsg);
++
++    /* Add the module to the log output */
++    snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "[%s] ", module);
++    prefixLen = strlen(formattedMsg);
++
++    // Append the log message.
++    vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, msg, v);
++    prefixLen = strlen(formattedMsg);
++
++    /* Add CR+LF */
++    snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "%s", "\r\n");
++
++#ifdef SEPARATE_LOGGING_INTERFACE
+     PRINTF("%s", formattedMsg);
+-    PRINTF("\r\n");
++#else
++    serial_write(formattedMsg, strlen(formattedMsg));
++#endif
+ }
+ 
+ /**

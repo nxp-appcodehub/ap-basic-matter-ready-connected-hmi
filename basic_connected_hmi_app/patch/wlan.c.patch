@@ -1,0 +1,26 @@
+diff --git a/wlcmgr/wlan.c b/wlcmgr/wlan.c
+index ccc6c03..8bb9f09 100644
+--- a/wlcmgr/wlan.c
++++ b/wlcmgr/wlan.c
+@@ -2758,10 +2758,10 @@ static void wlcm_request_reconnect(enum cm_sta_state *next, struct wlan_network
+         wlan.reassoc_request = false;
+         wlan.reassoc_count   = 0;
+ 
+-        CONNECTION_EVENT(WLAN_REASON_CONNECT_FAILED, NULL);
+-
+         wlcm_d("Disconnecting ... ");
+         (void)wlan_disconnect();
++        
++        CONNECTION_EVENT(WLAN_REASON_CONNECT_FAILED, NULL);
+     }
+ }
+ 
+@@ -3612,7 +3612,7 @@ int wlan_add_network(struct wlan_network *network)
+         {
+             if (strlen(wlan.networks[i].name) == len && !strncmp(wlan.networks[i].name, network->name, len))
+             {
+-                return -WM_E_INVAL;
++                return WM_E_EXIST;
+             }
+         }
+         else if (pos == -1)

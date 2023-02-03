@@ -1,0 +1,29 @@
+diff --git a/examples/platform/nxp/rt/rt1060/board/pin_mux.h b/examples/platform/nxp/rt/rt1060/board/pin_mux.h
+index 540cbf85e6..442b58dcef 100644
+--- a/examples/platform/nxp/rt/rt1060/board/pin_mux.h
++++ b/examples/platform/nxp/rt/rt1060/board/pin_mux.h
+@@ -552,6 +552,24 @@ void BOARD_InitArduinoUARTPins(void);
+  */
+ void BOARD_InitMurataModulePins(void);
+ 
++/*!
++ * @brief Configures pin routing and optionally pin electrical features.
++ *
++ */
++void BOARD_InitSemcPins(void);
++
++/*!
++ * @brief Configures pin routing and optionally pin electrical features.
++ *
++ */
++void BOARD_InitLCD(void);
++
++/*!
++ * @brief Configures pin routing and optionally pin electrical features.
++ *
++ */
++void BOARD_InitI2C1Pins(void);
++
+ #if defined(__cplusplus)
+ }
+ #endif

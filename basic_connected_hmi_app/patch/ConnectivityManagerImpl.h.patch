@@ -1,0 +1,21 @@
+diff --git a/src/platform/nxp/common/ConnectivityManagerImpl.h b/src/platform/nxp/common/ConnectivityManagerImpl.h
+index 0bfe11a372..98b57b6f0c 100644
+--- a/src/platform/nxp/common/ConnectivityManagerImpl.h
++++ b/src/platform/nxp/common/ConnectivityManagerImpl.h
+@@ -123,6 +123,8 @@ private:
+     uint32_t mWiFiStationReconnectIntervalMS;
+ 
+ #if CHIP_DEVICE_CONFIG_ENABLE_WPA
++    bool mWiFiReconnectRequired = false;
++
+     enum WiFiEventGroup
+     {
+         kWiFiEventGroup_WiFiStationModeBit = (1 << 0),
+@@ -135,6 +137,7 @@ private:
+     static void _NetifExtCallback(struct netif* netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t* args);
+ 
+     void OnStationConnected(void);
++    void OnStationDisconnected(void);
+     void UpdateInternetConnectivityState(void);
+ #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
+ };

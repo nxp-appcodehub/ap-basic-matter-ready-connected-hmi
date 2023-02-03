@@ -1,0 +1,236 @@
+diff --git a/third_party/nxp/rt_sdk/rt_sdk.gni b/third_party/nxp/rt_sdk/rt_sdk.gni
+index 4a3bae176b..bff9900ae8 100644
+--- a/third_party/nxp/rt_sdk/rt_sdk.gni
++++ b/third_party/nxp/rt_sdk/rt_sdk.gni
+@@ -35,6 +35,8 @@ declare_args() {
+   k32w0_transceiver_bin_path = rebase_path("${chip_root}/third_party/openthread/ot-nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h")
+   w8801_transceiver = false
+   iwx12_transceiver = false
++  # display
++  chip_enable_display = false
+ }
+ 
+ declare_args() {
+@@ -296,9 +298,52 @@ template("rt_sdk") {
+         _sdk_include_dirs += ["${rt_sdk_root}/middleware/wireless/framework/NVM/Interface"]
+     }
+ 
++    if (chip_enable_display) {
++      _sdk_include_dirs += [
++#SDK components
++        "${rt_sdk_root}/core/components/ft5406_rt",
++#LVGL files
++        "${rt_sdk_root}/middleware/lvgl/lvgl",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/draw",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/layouts",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/layouts/flex",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/layouts/grid",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/themes",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/themes/basic",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/themes/default",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/themes/mono",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/animimg",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/calendar",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/chart",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/colorwheel",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/imgbtn",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/keyboard",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/led",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/list",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/meter",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/msgbox",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/span",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/spinbox",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/spinner",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/tabview",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/tileview",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/win",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/gpu",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/hal",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets",
++      ]
++    }
++
+     libs = []
+ 
+     defines = [
++        "SKIP_SYSCLK_INIT",
+         "__STARTUP_CLEAR_BSS",
+         "__STARTUP_INITIALIZE_NONCACHEDATA",
+         "__STARTUP_INITIALIZE_RAMFUNCTION",
+@@ -313,6 +358,7 @@ template("rt_sdk") {
+         "gMainThreadStackSize_c=4096",
+         "XIP_EXTERNAL_FLASH=1",
+         "XIP_BOOT_HEADER_ENABLE=1",
++        "XIP_BOOT_HEADER_DCD_ENABLE=1",
+         "FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL=1",
+         "SDK_COMPONENT_INTEGRATION=1",
+         "FSL_DRIVER_TRANSFER_DOUBLE_WEAK_IRQ=0",
+@@ -329,6 +375,8 @@ template("rt_sdk") {
+         "SERIAL_MANAGER_TASK_STACK_SIZE=4048",
+     #LWIP common options
+         "USE_RTOS=1",
++        "BUTTON_SHORT_PRESS_THRESHOLD=500",
++        "BUTTON_LONG_PRESS_THRESHOLD=2000",
+       ]
+ 
+     if (rt_platform != "rw610")
+@@ -380,6 +428,13 @@ template("rt_sdk") {
+       ]
+     }
+ 
++    if (chip_enable_display) {
++      defines += [
++        "CHIP_DEVICE_CONFIG_ENABLE_DISPLAY=1",
++        "LV_CONF_INCLUDE_SIMPLE=1",
++      ]
++    }
++
+     if (chip_enable_pairing_autostart == 1) {
+       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART=1" ]
+     } else {
+@@ -493,6 +548,138 @@ template("rt_sdk") {
+       "${rt_sdk_root}/middleware/wireless/framework/FileSystem/fwk_filesystem.c",
+     ]
+ 
++    if (chip_enable_display) {
++      sources += [
++#SDK components
++        "${rt_sdk_root}/core/components/ft5406_rt/fsl_ft5406_rt.c",
++#LVGL files
++        "${rt_sdk_root}/middleware/lvgl/lvgl/lvgl.h",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/lv_api_map.h",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_disp.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_event.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_group.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_indev.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_indev_scroll.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_obj.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_obj_class.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_obj_draw.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_obj_pos.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_obj_scroll.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_obj_style.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_obj_style_gen.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_obj_tree.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_refr.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/core/lv_theme.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/draw/lv_draw_arc.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/draw/lv_draw_blend.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/draw/lv_draw_img.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/draw/lv_draw_label.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/draw/lv_draw_line.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/draw/lv_draw_mask.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/draw/lv_draw_rect.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/draw/lv_draw_triangle.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/draw/lv_img_buf.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/draw/lv_img_cache.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/draw/lv_img_decoder.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/lv_extra.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/layouts/flex/lv_flex.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/layouts/grid/lv_grid.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/themes/basic/lv_theme_basic.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/themes/default/lv_theme_default.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/themes/mono/lv_theme_mono.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/animimg/lv_animimg.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/calendar/lv_calendar.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/calendar/lv_calendar_header_arrow.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/calendar/lv_calendar_header_dropdown.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/chart/lv_chart.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/colorwheel/lv_colorwheel.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/imgbtn/lv_imgbtn.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/keyboard/lv_keyboard.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/led/lv_led.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/list/lv_list.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/meter/lv_meter.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/msgbox/lv_msgbox.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/span/lv_span.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/spinbox/lv_spinbox.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/spinner/lv_spinner.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/tabview/lv_tabview.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/tileview/lv_tileview.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/extra/widgets/win/lv_win.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_dejavu_16_persian_hebrew.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_fmt_txt.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_loader.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_8.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_10.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_12.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_12_subpx.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_14.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_16.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_18.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_20.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_22.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_24.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_26.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_28.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_28_compressed.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_30.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_32.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_34.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_36.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_38.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_40.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_42.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_44.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_46.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_montserrat_48.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_simsun_16_cjk.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_unscii_8.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/font/lv_font_unscii_16.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/gpu/lv_gpu_nxp_pxp.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/gpu/lv_gpu_nxp_pxp_osa.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/gpu/lv_gpu_nxp_vglite.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/hal/lv_hal_disp.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/hal/lv_hal_indev.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/hal/lv_hal_tick.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_anim.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_area.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_async.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_bidi.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_color.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_fs.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_gc.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_ll.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_log.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_math.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_mem.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_printf.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_style.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_style_gen.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_templ.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_timer.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_tlsf.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_txt.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_txt_ap.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/misc/lv_utils.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_arc.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_bar.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_btn.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_btnmatrix.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_canvas.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_checkbox.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_dropdown.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_img.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_label.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_line.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_objx_templ.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_roller.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_slider.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_switch.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_table.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/widgets/lv_textarea.c",
++        "${rt_sdk_root}/middleware/lvgl/lvgl/src/lv_conf_internal.h",
++      ]
++    }
+ 
+     if (!defined(public_configs)) {
+       public_configs = []

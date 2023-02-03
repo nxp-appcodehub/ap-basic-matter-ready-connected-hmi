@@ -1,0 +1,94 @@
+diff --git a/src/platform/nxp/common/ConnectivityManagerImpl.cpp b/src/platform/nxp/common/ConnectivityManagerImpl.cpp
+index 25e772403e..dcc9ff6b22 100644
+--- a/src/platform/nxp/common/ConnectivityManagerImpl.cpp
++++ b/src/platform/nxp/common/ConnectivityManagerImpl.cpp
+@@ -194,6 +194,11 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
+     }
+ #endif /* CHIP_DETAIL_LOGGING */
+ 
++    /* Needed for the re-connect. */
++    CHIP_ERROR ret = CHIP_NO_ERROR;
++    char currentSSID[DeviceLayer::Internal::kMaxWiFiSSIDLength] = {0};
++    char currentPassword[DeviceLayer::Internal::kMaxWiFiKeyLength] = {0};
++
+     switch (wlanEvent)
+     {
+         case WLAN_REASON_SUCCESS:
+@@ -204,6 +209,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
+                 sInstance._SetWiFiStationState(kWiFiStationState_Connected);
+                 NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kSuccess, CharSpan(), wlanEvent);
+                 sInstance.OnStationConnected();
++                mWiFiReconnectRequired = false;
+             }
+             break;
+ 
+@@ -215,6 +221,21 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
+             ChipLogError(DeviceLayer, "WLAN (re)connect failed");
+             sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
+             UpdateInternetConnectivityState();
++            if (mWiFiReconnectRequired)
++        	{
++        	    /* Try reconnecting to the WiFi network.*/
++        	    if (NetworkCommissioning::NXPWiFiDriver::GetInstance().GetNetworkSSID((char*)&currentSSID) == NetworkCommissioning::Status::kSuccess)
++        	    {
++        		    if (NetworkCommissioning::NXPWiFiDriver::GetInstance().GetNetworkPassword((char*)&currentPassword) == NetworkCommissioning::Status::kSuccess)
++        		    {
++        			    ret = ProvisionWiFiNetwork(currentSSID, currentPassword);
++        			    if (ret != CHIP_NO_ERROR)
++        			    {
++        				    ChipLogError(DeviceLayer, "ProvisionWiFiNetwork while reconnecting failed");
++        			    }
++        			}
++        		}
++        	}
+             break;
+ 
+         case WLAN_REASON_NETWORK_NOT_FOUND:
+@@ -233,14 +254,16 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
+             if (sInstance._GetWiFiStationState() == kWiFiStationState_Connected)
+             {
+                 sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
+-                UpdateInternetConnectivityState();
++                sInstance.OnStationDisconnected();
+             }
++            mWiFiReconnectRequired = true;
+             break;
+ 
+         case WLAN_REASON_USER_DISCONNECT:
+             ChipLogProgress(DeviceLayer, "Disconnected from WLAN network");
+             sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
+-            UpdateInternetConnectivityState();
++            sInstance.OnStationDisconnected();
++            mWiFiReconnectRequired = false;
+             break;
+ 
+         case WLAN_REASON_INITIALIZED:
+@@ -275,6 +298,19 @@ void ConnectivityManagerImpl::OnStationConnected()
+     UpdateInternetConnectivityState();
+ }
+ 
++void ConnectivityManagerImpl::OnStationDisconnected()
++{
++    CHIP_ERROR err;
++    ChipDeviceEvent event;
++
++    event.Type                          = DeviceEventType::kWiFiConnectivityChange;
++    event.WiFiConnectivityChange.Result = kConnectivity_Lost;
++    (void ) PlatformMgr().PostEvent(&event);
++
++    /* Update the connectivity state in case the connected event has been received after getting an IP addr */
++    UpdateInternetConnectivityState();
++}
++
+ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
+ {
+     bool haveIPv4Conn      = false;
+@@ -437,7 +473,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
+     }
+ 
+     result = wlan_add_network(&network);
+-    VerifyOrExit(result == WM_SUCCESS, ret = CHIP_ERROR_INTERNAL);
++    VerifyOrExit(result == WM_SUCCESS || result == WM_E_EXIST, ret = CHIP_ERROR_INTERNAL);
+ 
+     _SetWiFiStationState(kWiFiStationState_Connecting);
+ 

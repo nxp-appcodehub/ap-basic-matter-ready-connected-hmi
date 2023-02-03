@@ -1,0 +1,55 @@
+diff --git a/third_party/nxp/rt_sdk/rt1060/rt1060.gni b/third_party/nxp/rt_sdk/rt1060/rt1060.gni
+index fb0d35e60d..9021f52cd6 100644
+--- a/third_party/nxp/rt_sdk/rt1060/rt1060.gni
++++ b/third_party/nxp/rt_sdk/rt1060/rt1060.gni
+@@ -37,6 +37,9 @@ DRIVER_CACHE_FILES_PATH = "${DRIVER_FILES_PATH}/cache/armv7-m7"
+ DRIVER_COMMON_FILES_PATH = "${DRIVER_FILES_PATH}/common"
+ DRIVER_DEVICE_FILES_PATH = "${rt_sdk_root}/core/devices/${deviceBoardName}/drivers"
+ DRIVER_USDHC_FILES_PATH = "${DRIVER_FILES_PATH}/usdhc"
++DRIVER_PXP_FILES_PATH = "${DRIVER_FILES_PATH}/pxp"
++DRIVER_LPI2C_FILES_PATH = "${DRIVER_FILES_PATH}/lpi2c"
++DRIVER_ELCDIF_FILES_PATH = "${DRIVER_FILES_PATH}/elcdif"
+ COMPONENT_CRC_FILES_PATH = "${COMPONENT_FILES_PATH}/crc"
+ COMPONENT_RNG_FILES_PATH = "${COMPONENT_FILES_PATH}/rng"
+ COMPONENT_SILICON_ID_FILES_PATH = "${COMPONENT_FILES_PATH}/silicon_id"
+@@ -81,6 +84,9 @@ template("rt1060_sdk_drivers") {
+         "${DRIVER_CACHE_FILES_PATH}",
+         "${DRIVER_PIT_FILES_PATH}",
+         "${DRIVER_USDHC_FILES_PATH}",
++        "${DRIVER_PXP_FILES_PATH}",
++        "${DRIVER_LPI2C_FILES_PATH}",
++        "${DRIVER_ELCDIF_FILES_PATH}",
+         "${DRIVER_TRNG_FILES_PATH}",
+         "${DRIVER_FLEXSPI_FILES_PATH}",
+         "${UTILITIES_FILES_PATH}",
+@@ -132,8 +138,13 @@ template("rt1060_sdk_drivers") {
+ 
+     if (chip_enable_matter_cli)
+     {
+-      #When the CLI is enabled the debug console should be moved in UART2 for RT1060
+-      defines += [ "DEBUG_CONSOLE_UART_INDEX=2" ]
++      defines += [ "ENABLE_CHIP_SHELL" ]
++
++      if (!chip_cli_logs_same_interface)
++      {
++        #When the CLI is enabled and logs are required separate, the debug console should be moved in UART2 for RT1060
++        defines += [ "DEBUG_CONSOLE_UART_INDEX=2" , "SEPARATE_LOGGING_INTERFACE" ]
++      }
+     }
+ 
+     cflags = []
+@@ -200,7 +211,13 @@ template("rt1060_sdk_drivers") {
+         "${rt_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}/board_comp.c",
+         "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform.c",
+         #sdk hook
+-        "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/mbedtls/ksdk_mbedtls_hook.c"
++        "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/mbedtls/ksdk_mbedtls_hook.c",
++        #other drivers
++        "${DRIVER_PXP_FILES_PATH}/fsl_pxp.c",
++        "${DRIVER_LPI2C_FILES_PATH}/fsl_lpi2c.c",
++        "${DRIVER_ELCDIF_FILES_PATH}/fsl_elcdif.c",
++        #DCD
++        "${rt_sdk_root}/core/boards/${evkname}/project_template/dcd.c",
+     ]
+ 
+     if (sdk_fsl_assert_support) {

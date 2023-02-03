@@ -1,0 +1,29 @@
+diff --git a/src/platform/nxp/common/NetworkCommissioningWiFiDriver.cpp b/src/platform/nxp/common/NetworkCommissioningWiFiDriver.cpp
+index d803a4b685..e024561696 100644
+--- a/src/platform/nxp/common/NetworkCommissioningWiFiDriver.cpp
++++ b/src/platform/nxp/common/NetworkCommissioningWiFiDriver.cpp
+@@ -146,6 +146,24 @@ Status NXPWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDeb
+ 
+     // Use empty ssid for representing invalid network
+     mStagingNetwork.ssidLen = 0;
++    memset(mStagingNetwork.ssid, 0, DeviceLayer::Internal::kMaxWiFiSSIDLength);
++    memset(mStagingNetwork.credentials, 0, DeviceLayer::Internal::kMaxWiFiKeyLength);
++    return Status::kSuccess;
++}
++
++Status NXPWiFiDriver::GetNetworkSSID(char * ssid)
++{
++    VerifyOrReturnError(ssid != NULL, Status::kOutOfRange);
++
++    memcpy(ssid, mStagingNetwork.ssid, mStagingNetwork.ssidLen);
++    return Status::kSuccess;
++}
++
++Status NXPWiFiDriver::GetNetworkPassword(char * credentials)
++{
++    VerifyOrReturnError(credentials != NULL, Status::kOutOfRange);
++
++    memcpy(credentials, mStagingNetwork.credentials, mStagingNetwork.credentialsLen);
+     return Status::kSuccess;
+ }
+ 

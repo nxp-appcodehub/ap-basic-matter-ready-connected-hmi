@@ -1,0 +1,25 @@
+diff --git a/third_party/nxp/rt_sdk/rt1060/BUILD.gn b/third_party/nxp/rt_sdk/rt1060/BUILD.gn
+index c58e9ad255..358d0a1277 100644
+--- a/third_party/nxp/rt_sdk/rt1060/BUILD.gn
++++ b/third_party/nxp/rt_sdk/rt1060/BUILD.gn
+@@ -54,10 +54,11 @@ rt1060_sdk_drivers("rt_sdk_drivers") {
+         "SPINEL_ENABLE_RX_RTS=1",
+         "SPINEL_ENABLE_TX_RTS=1",
+         #OTW configurations
+-        "OTW_RESET_PIN_PORT=6",
+-        "OTW_RESET_PIN_NUM=2",
+         "OTW_DIO5_PIN_PORT=6",
+         "OTW_DIO5_PIN_NUM=26",
++        #CHIP_DEVICE_CONFIG_ENABLE_DISPLAY modification
++        "OTW_RESET_PIN_PORT=1",
++        "OTW_RESET_PIN_NUM=27"
+       ]
+     }
+ 
+@@ -70,4 +71,4 @@ rt1060_sdk_drivers("rt_sdk_drivers") {
+ 
+ group("nxp_mbedtls") {
+   public_deps = ["${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_ksdk_mbedtls"]
+-}
+\ No newline at end of file
++}
