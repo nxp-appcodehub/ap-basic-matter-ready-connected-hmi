@@ -17,7 +17,7 @@
  */
 
 /*
- *  Copyright 2023 NXP
+ *  Copyright 2023-2024 NXP
  *
  *  SPDX-License-Identifier: BSD-3-Clause
  */
@@ -53,49 +53,6 @@ bool cluserInit = false;
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/att-storage.h>
 #include <app/util/af.h>
-
-#ifdef SHOW_DATE_TIME
-static void UpdateTask(void *param)
-{
-    uint8_t count = 0;
-    /* Use dummy date and hour */
-    uint16_t year = 2023;
-    uint8_t month = 5;
-    uint8_t day = 10;
-    uint8_t hour = 00;
-    uint8_t min = 00;
-    uint8_t am_or_pm = 0;
-    updateDate(year, month, day);
-    updateTime(hour, min, am_or_pm);
-
-    for (;;){
-        vTaskDelay(1000/portTICK_PERIOD_MS);
-        /*
-         * Update Time and Date:
-         * Dummy way just for demo - update minutes each second
-         */
-        min = (min+1)%60;
-        if(min == 0){
-            hour = (hour + 1)%12;
-            if(hour == 0){
-                am_or_pm = (am_or_pm + 1)%2;
-                if(am_or_pm == 0){
-                    day = (day+1)%31;
-                    if(day == 0){
-                        month = month%12 + 1;
-                        if(month == 1){
-                            year = year + 1;
-                        }
-                    }
-                    updateDate(year, month, day);
-                }
-            }
-        }
-        updateTime(hour, min, am_or_pm);
-    }
-}
-#endif
-
 #endif
 
 extern "C" int main(int argc, char * argv[])
@@ -111,14 +68,6 @@ extern "C" int main(int argc, char * argv[])
         ChipLogError(DeviceLayer, "Failed to start display task");
         assert(false);
     }
-
-#ifdef SHOW_DATE_TIME
-    if (xTaskCreate(UpdateTask, "UpdateTask", configMINIMAL_STACK_SIZE + 800, NULL, configMAX_PRIORITIES - 6, NULL) != pdPASS)
-    {
-        ChipLogError(DeviceLayer, "Failed to start display task");
-        assert(false);
-    }
-#endif
 #endif
 
     ChipLogProgress(DeviceLayer, "Starting FreeRTOS scheduler");

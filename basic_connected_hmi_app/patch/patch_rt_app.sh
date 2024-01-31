@@ -35,6 +35,8 @@ patch_app()
     patch -N $1/third_party/nxp/rt_sdk/BUILD.gn <BUILD_rt_sdk.gn.patch || :
     patch -N $1/third_party/nxp/rt_sdk/rt1060/BUILD.gn <BUILD_rt1060.gn.patch || :
     patch -N $1/third_party/nxp/rt_sdk/repo/middleware/wifi_nxp/wlcmgr/wlan.c <wlan.c.patch || :
+    #patch ESP32 requirements to fix https://github.com/project-chip/connectedhomeip/issues/28435 seen on pre Matter 1.1 SDKs
+    patch -N $1/scripts/requirements.esp32.txt <source_activation_fix.patch || :
 
     echo "Matter SDK folder \"$1\" has been patched!"
 }

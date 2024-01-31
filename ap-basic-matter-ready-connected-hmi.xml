@@ -1,10 +1,10 @@
 <data:item xmlns:data="data" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="data ../../xsd/alp.xsd" id="ap-basic-matter-ready-connected-hmi" type="sw_pack" format="projectfile" name="Basic Matter Ready Connected HMI">
     <display_title>
-        Basic Matter Ready Connected HMI platform with cost-optimized MCU, Wi-Fi 4, Thread, and BLE 5
+        Basic Matter Ready Connected HMI platform with cost-optimized MCU, Wi-Fi 4, Thread, and Bluetooth Low Energy 5.0
     </display_title>
     <overview>
         <![CDATA[NXP's cost-optimized MCU (FreeRTOS)
-  platform enables Matter-ready edge node development with Wi-Fi 4, Thread, and BLE 5 wireless connectivity protocols using i.MX RT1060 MCU, K32W0x MCU, and 88W8801 Wi-Fi SoC.]]>
+  platform enables Matter-ready edge node development with Wi-Fi 4, Thread, and Bluetooth Low Energy 5.0 wireless connectivity protocols using i.MX RT1060 MCU, K32W0x MCU, and 88W8801 Wi-Fi SoC.]]>
     </overview>
     <toolchains>
 		<toolchain name="gcc"/>

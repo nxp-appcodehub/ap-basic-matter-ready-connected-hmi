@@ -1,5 +1,5 @@
 # Copyright (c) 2021 Project CHIP Authors
-# Copyright (c) 2023 NXP
+# Copyright (c) 2023-2024 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -136,7 +136,6 @@ rt_executable("all_cluster_app") {
       "src/main/include/lv_conf.h",
       "src/main/display_app.cpp",
       "src/main/include/display_app.h",
-      "src/main/assets/matterIcon.c",
       "src/main/assets/networkIcon.c",
       "src/main/assets/threadIcon.c",
       "src/main/assets/bluetoothIcon.c",
@@ -145,7 +144,6 @@ rt_executable("all_cluster_app") {
       "src/main/assets/displayResources.h",
       "src/main/assets/qrcodeIcon.c",
       "src/main/assets/infoqrIcon.c",
-      "src/main/assets/nxpIcon.c",
     ]
     defines += [
       "CHIP_DEVICE_CONFIG_ENABLE_DISPLAY=1",

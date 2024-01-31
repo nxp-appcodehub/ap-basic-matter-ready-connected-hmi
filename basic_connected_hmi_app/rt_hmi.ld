@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2021, The OpenThread Authors.
- *  Copyright (c) 2023 NXP
+ *  Copyright (c) 2023-2024 NXP
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -451,7 +451,7 @@ SECTIONS
     . = ALIGN(4);
     __bss_end__ = .;
     __END_BSS = .;
-  } > m_data2
+  } > BOARD_SDRAM
 
   .heap (NOLOAD) :
   {

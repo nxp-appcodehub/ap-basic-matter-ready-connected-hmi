@@ -1,0 +1,54 @@
+Package: Basic Connected Human Machine Interface (HMI) Application Software Pack
+Version: 1.1
+Package License: LA_OPT_NXP_Software_License v56 April 2024 - Additional Distribution License granted, license in Section 2.3 applies
+Package License File: LICENSE.txt
+Type of content: Application Software Pack (source code)
+Release Location: https://github.com/nxp-appcodehub/ap-basic-matter-ready-connected-hmi
+Origin: NXP (BSD-3-Clause)
+        Connectivity Standards Alliance (Apache-2.0) - https://github.com/project-chip/connectedhomeip
+        LVGL community (MIT) - https://github.com/lvgl/lvgl/tree/v8.0.2
+
+Matter SDK                 Name: matter.git
+                           Version: 1.0.0.2.x
+                           Outgoing license: Apache License 2.0
+                           License File: matter/LICENSE
+                           Format: source code
+                           Description and comments: NXP fork of Matter SDK
+                           Release Location: https://github.com/NXP/matter/tree/v1.0.0.2-tag-nxp
+                           Origin: Connectivity Standards Alliance (Apache-2.0) - https://github.com/project-chip/connectedhomeip
+
+BCHMI example              Name: RT1060 BCHMI app and K32W0x1 RCP and lighting app prebuilt binaries
+binaries                   Version: 1.0
+                           Outgoing license: BSD-3-Clause
+                           License File: COPYING-BSD-3
+                           Format: Binaries and readme file
+                           Release Location: binaries/                     
+                           Description and comments: Prebuilt binaries for RT1060 BCHMI and K32W061 RCP and lighting apps
+                           Origin: NXP (BSD-3-Clause)
+
+RT1060 Basic               Name: RT1060 Basic Connected HMI Application Source Code
+Connected HMI App          Version: 1.0
+                           Outgoing license: BSD-3-Clause
+                           License File: COPYING-BSD-3
+                           Format: Source code, header files, patch files and script
+                           Release Location: basic_connected_hmi_app/
+                           Description and comments: Source code for Basic Connected HMI application running on RT1060
+                           Origin: NXP (BSD-3-Clause)
+
+Basic Connected            Name: RT1060 Basic Connected HMI build files
+HMI build files            Version: 1.0
+                           Outgoing license: BSD-3-Clause
+                           License File: COPYING-BSD-3
+                           Format: Source code
+                           Release Location: build/
+                           Description and comments: Build files required for Basic Connected HMI application
+                           Origin: NXP (BSD-3-Clause)
+                           
+LVGL source code           Name: LVGL source code for KSDK
+                           Version: 8.0.2_rev1
+                           Outgoing license: MIT
+                           License File: basic_connected_hmi_app/patch/lvgl/lvgl/LICENCE.txt
+                           Format: Source code with header files
+                           Release Location: basic_connected_hmi_app/patch/lvgl
+                           Description and comments: Source code for LVGL embedded graphics library running on RT1060
+                           Origin: LVGL community (MIT) - https://github.com/lvgl/lvgl/tree/v8.0.2

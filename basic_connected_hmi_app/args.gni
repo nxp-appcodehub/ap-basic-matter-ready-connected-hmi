@@ -1,5 +1,5 @@
 # Copyright (c) 2020 Project CHIP Authors
-# Copyright (c) 2023 NXP
+# Copyright (c) 2023-2024 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,4 +30,6 @@ chip_automation_logging = false
 chip_cli_logs_same_interface = false
 
 chip_enable_display = true
+# Display panel type can be RK043FN02H-CT or RK043FN66HS-CTG
+display_type = "RK043FN02H-CT"
 nxp_device_type = "all-clusters"

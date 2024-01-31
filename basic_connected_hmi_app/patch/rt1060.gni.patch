@@ -1,5 +1,5 @@
 diff --git a/third_party/nxp/rt_sdk/rt1060/rt1060.gni b/third_party/nxp/rt_sdk/rt1060/rt1060.gni
-index fb0d35e60d..9021f52cd6 100644
+index fb0d35e60d..26fe735b29 100644
 --- a/third_party/nxp/rt_sdk/rt1060/rt1060.gni
 +++ b/third_party/nxp/rt_sdk/rt1060/rt1060.gni
 @@ -37,6 +37,9 @@ DRIVER_CACHE_FILES_PATH = "${DRIVER_FILES_PATH}/cache/armv7-m7"
@@ -12,7 +12,23 @@ index fb0d35e60d..9021f52cd6 100644
  COMPONENT_CRC_FILES_PATH = "${COMPONENT_FILES_PATH}/crc"
  COMPONENT_RNG_FILES_PATH = "${COMPONENT_FILES_PATH}/rng"
  COMPONENT_SILICON_ID_FILES_PATH = "${COMPONENT_FILES_PATH}/silicon_id"
-@@ -81,6 +84,9 @@ template("rt1060_sdk_drivers") {
+@@ -44,6 +47,7 @@ COMPONENT_UART_FILES_PATH = "${COMPONENT_FILES_PATH}/uart"
+ COMPONENT_TIMER_FILES_PATH = "${COMPONENT_FILES_PATH}/timer"
+ COMPONENT_GPIO_FILES_PATH = "${COMPONENT_FILES_PATH}/gpio"
+ COMPONENT_MEM_MANAGER_FILES_PATH = "${COMPONENT_FILES_PATH}/mem_manager"
++COMPONENT_VIDEO_FILES_PATH = "${COMPONENT_FILES_PATH}/video"
+ UTILITIES_FILES_PATH = "${rt_sdk_root}/core/utilities"
+ UTILITIES_DEVICE_FILES_PATH = "${rt_sdk_root}/core/devices/${deviceBoardName}/utilities"
+ DEBUG_CONSOLE_FILES_PATH = "${UTILITIES_FILES_PATH}/debug_console_lite"
+@@ -70,6 +74,7 @@ template("rt1060_sdk_drivers") {
+         "${COMPONENT_TIMER_FILES_PATH}",
+         "${COMPONENT_GPIO_FILES_PATH}",
+         "${COMPONENT_MEM_MANAGER_FILES_PATH}",
++        "${COMPONENT_VIDEO_FILES_PATH}",
+         "${DRIVER_COMMON_FILES_PATH}",
+         "${DRIVER_LPUART_FILES_PATH}",
+         "${DRIVER_EDMA_FILES_PATH}",
+@@ -81,6 +86,9 @@ template("rt1060_sdk_drivers") {
          "${DRIVER_CACHE_FILES_PATH}",
          "${DRIVER_PIT_FILES_PATH}",
          "${DRIVER_USDHC_FILES_PATH}",
@@ -22,7 +38,7 @@ index fb0d35e60d..9021f52cd6 100644
          "${DRIVER_TRNG_FILES_PATH}",
          "${DRIVER_FLEXSPI_FILES_PATH}",
          "${UTILITIES_FILES_PATH}",
-@@ -132,8 +138,13 @@ template("rt1060_sdk_drivers") {
+@@ -132,8 +140,13 @@ template("rt1060_sdk_drivers") {
  
      if (chip_enable_matter_cli)
      {
@@ -38,7 +54,15 @@ index fb0d35e60d..9021f52cd6 100644
      }
  
      cflags = []
-@@ -200,7 +211,13 @@ template("rt1060_sdk_drivers") {
+@@ -177,6 +190,7 @@ template("rt1060_sdk_drivers") {
+         "${COMPONENT_TIMER_FILES_PATH}/fsl_adapter_pit.c",
+         "${COMPONENT_GPIO_FILES_PATH}/fsl_adapter_igpio.c",
+         "${COMPONENT_MEM_MANAGER_FILES_PATH}/fsl_component_mem_manager.c",
++        "${COMPONENT_VIDEO_FILES_PATH}/fsl_video_common.c",
+         "${UTILITIES_DEVICE_FILES_PATH}/fsl_shell.c",
+         "${DEBUG_CONSOLE_FILES_PATH}/fsl_debug_console.c",
+         # comment fsl_str.c if using debug console light
+@@ -200,7 +214,13 @@ template("rt1060_sdk_drivers") {
          "${rt_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}/board_comp.c",
          "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform.c",
          #sdk hook

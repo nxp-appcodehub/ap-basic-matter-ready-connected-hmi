@@ -2,9 +2,9 @@
 [<img src="https://mcuxpresso.nxp.com/static/icon/nxp-logo-color.svg" width="100"/>](https://www.nxp.com)
 
 ## Basic Matter Ready Connected HMI Application
-### Cost-optimized MCU (FreeRTOS) platform with Wi-Fi 4, Thread, BLE 5
+### Cost-optimized MCU (FreeRTOS) platform with Wi-Fi 4, Thread, Bluetooth Low Energy 5.0
 NXP's cost-optimized MCU (FreeRTOS)
-  platform enables Matter-ready edge node development with Wi-Fi 4, Thread, and BLE 5 wireless connectivity protocols using i.MX RT1060 MCU, K32W0x MCU, and 88W8801 Wi-Fi SoC.
+  platform enables Matter-ready edge node development with Wi-Fi 4, Thread, and Bluetooth Low Energy 5.0 wireless connectivity protocols using i.MX RT1060 MCU, K32W0x MCU, and 88W8801 Wi-Fi SoC.
 
 #### Boards: EVK-MIMXRT1060
 #### Categories: Wireless Connectivity, HMI, Cloud connected devices, RTOS
@@ -27,6 +27,9 @@ NXP's cost-optimized MCU (FreeRTOS)
 13. [Known Issues](#step13)
 
 ## 1. Software<a name="step1"></a>
+
+This repository contains necessary software for running Connected HMI Application with Matter support, using Wi-Fi 4, Thread, and Bluetooth Low Energy 5.0 (referenced as BLE) wireless connectivity protocols for i.MX RT1060 MCU, K32W0x MCU, and 88W8801 Wi-Fi SoC.
+
 ### Repository structure
 
 This repository contains several folders related to the project:
@@ -39,13 +42,16 @@ This repository contains several folders related to the project:
 ## 2. Hardware<a name="step2"></a>
 
 The application requires the following hardware setup:
-- [RT1060 EVKB](https://www.nxp.com/search?keyword=mimxrt1060-evkb) (Or EVKA) development board with [RK043FN02H-CT](https://www.nxp.com/part/RK043FN02H-CT#/) 4.3-inch TFT 480*272 LCD
+- [RT1060 EVKB](https://www.nxp.com/search?keyword=mimxrt1060-evkb) (or EVKA) development board
+- [RK043FN66HS-CTG](https://www.nxp.com/part/RK043FN66HS-CTG#/) or [RK043FN02H-CT](https://www.nxp.com/part/RK043FN02H-CT#/) 4.3-inch TFT 480*272 LCD Panel
 - K32W0x1 mezzanine module (for Thread connection)
 - [IOTZTB-DK006](https://www.nxp.com/part/IOTZTB-DK006#/) carrier board for the K32W0x1 module (referenced as DK6 carrier board)
 - 2.54 mm jumper cables
 - 88W8801 module (for WiFi connection), for example 88W8801 2DS M.2 Module (rev A) and Murata uSD-M.2 Adapter (rev B1)
 
-> **_Note:_** as the 88W8801 module supports only the 2.4 GHz Wi-Fi band, it is mandatory to connect it to a WiFi access point on the 2.4 GHz band.
+> **_Note on WiFi:_** as the 88W8801 module supports only the 2.4 GHz Wi-Fi band, it is mandatory to connect it to a WiFi access point on the 2.4 GHz band.
+
+> **_Note on LCD:_** The default LCD module of the application is set to RK043FN02H-CT LCD Panel. In order to use RK043FN66HS-CTG LCD Panel, add display_type="RK043FN66HS-CTG" to the ```gn gen``` command in the build system. See the Setup chapter below.
 
 ### Hardware connections
 
@@ -214,7 +220,7 @@ The output of the build can be found in the build_k32w061 folder. The OT only RC
 
 For this setup you will need an OpenThread Border Router, a controller device running Chip-Tool and two boards flashed with any aplicatin that is based on the OnOff cluster (e.g. Ligthing App, All-clusters app, Plug-app, etc.).
 
-In this example you will bind the two On/Off based Matter end nodes to the IHD and control them as well as displayng their state in real time.
+In this example you will bind the two On/Off based Matter end nodes to the IHD and control them as well as displaying their state in real time.
 
 Due to the fact that some identification parameters for bound devices are hardcoded in this code version, we recommend using with the [light-switch-combo](https://github.com/NXP/matter/blob/v1.0-branch-nxp/examples/light-switch-combo-app/nxp/k32w/k32w0/README.md) application to be sure that there are no issues (subscription and on/off commands might not work depending on device cluster configuration) 
 
@@ -424,9 +430,20 @@ Questions regarding the content/correctness of this example can be entered as Is
 ## 12. Release Notes<a name="step12"></a>
 | Version | Description / Update                           | Date                        |
 |:-------:|------------------------------------------------|----------------------------:|
+| 1.1     | Maintenance Release                            | April     1<sup>st</sup> 2024 |
 | 1.0     | Initial release on Application Code Hub        | September 1<sup>st</sup> 2023 |
 
 ## 13. Known Issues and Limitations<a name="step13"></a>
+
+Release 1.1:
+
+-   Bluetooth Low Energy naming update
+-   Matter activation fix for pre-Matter 1.1 versions
+-   Added support for RK043FN66HS-CTG display panel
+-   Minor GUI fixes
+> **_Note:_**
+-   This release has been fully tested using the configuration with RK043FN02H-CT display panel. Limited testing has been conducted using the configuration with RK043FN66HS-CTG display panel.
+
 
 Release 1.0:
 

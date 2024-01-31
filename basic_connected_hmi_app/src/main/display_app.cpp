@@ -1,5 +1,5 @@
 /*
- *  Copyright 2023 NXP
+ *  Copyright 2023-2024 NXP
  *
  *  SPDX-License-Identifier: BSD-3-Clause
  */
@@ -64,9 +64,7 @@ LV_IMG_DECLARE(bluetoothIcon);
 LV_IMG_DECLARE(onoffIcon);
 LV_IMG_DECLARE(qrcodeIcon);
 LV_IMG_DECLARE(infoqrIcon);
-LV_IMG_DECLARE(nxpIcon);
 LV_IMG_DECLARE(thermometerIcon);
-LV_IMG_DECLARE(matterIcon);
 
 /**********************
  *  STATIC VARIABLES
@@ -116,6 +114,49 @@ bool s_lvgl_initialized = false;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+#ifdef SHOW_DATE_TIME
+static void updateDisplayTimeTask(void *param)
+{
+    uint8_t count = 0;
+    /* Use dummy date and hour */
+    uint16_t year = 2023;
+    uint8_t month = 5;
+    uint8_t day = 10;
+    uint8_t hour = 00;
+    uint8_t min = 00;
+    uint8_t am_or_pm = 0;
+    updateDate(year, month, day);
+    updateTime(hour, min, am_or_pm);
+
+    for (;;){
+        vTaskDelay(1000/portTICK_PERIOD_MS);
+        /*
+         * Update Time and Date:
+         * Dummy way just for demo - update minutes each second
+         */
+        min = (min+1)%60;
+        if(min == 0){
+            hour = (hour + 1)%12;
+            if(hour == 0){
+                am_or_pm = (am_or_pm + 1)%2;
+                if(am_or_pm == 0){
+                    day = (day+1)%31;
+                    if(day == 0){
+                        month = month%12 + 1;
+                        if(month == 1){
+                            year = year + 1;
+                        }
+                    }
+                    updateDate(year, month, day);
+                }
+            }
+        }
+        updateTime(hour, min, am_or_pm);
+    }
+}
+#endif
+
 void display_task(void *pvParameters)
 {
     lv_port_pre_init();
@@ -131,6 +172,14 @@ void display_task(void *pvParameters)
     s_lvgl_initialized = true;
 
     lv_start_display();
+
+#ifdef SHOW_DATE_TIME
+    if (xTaskCreate(updateDisplayTimeTask, "UpdateTask", configMINIMAL_STACK_SIZE + 800, NULL, configMAX_PRIORITIES - 6, NULL) != pdPASS)
+    {
+        ChipLogError(DeviceLayer, "Failed to start display task");
+        assert(false);
+    }
+#endif
 
     for (;;)
     {
@@ -229,11 +278,12 @@ static void lv_create_homeTab(lv_obj_t * parent)
     lv_label_set_text(qrlabel, "Scan for pairing    :");
     lv_obj_align_to(qrlabel, qrcodeIconImage, LV_ALIGN_OUT_TOP_MID, 0, -25);
 
-        /* Right side states container */
+    /* Right side states container */
     lv_obj_t * StatePanel = lv_obj_create(parent);
     lv_obj_set_size(StatePanel, lv_pct(67), lv_pct(50));
     lv_obj_set_grid_cell(StatePanel, LV_GRID_ALIGN_START, 1, 1, LV_GRID_ALIGN_START, 0, 1);
     lv_obj_add_style(StatePanel, &gTabStyle, LV_STATE_DEFAULT);
+
     /* Network diagnostics */
     NetworkStatusCard = lv_obj_create(StatePanel);
     lv_obj_set_size(NetworkStatusCard, lv_pct(33)-2, lv_pct(100));
@@ -322,18 +372,21 @@ static void lv_create_infoTab(lv_obj_t * parent)
     lv_label_set_text(qrlabel, "Scan QR code for more info:");
     lv_obj_align(qrlabel, LV_ALIGN_LEFT_MID, 0, -20);
 
-    /*NXP logo*/
-    lv_obj_t * nxpIconImage = lv_img_create(parent);
-    lv_img_set_src(nxpIconImage, &nxpIcon);
-    lv_img_set_zoom(nxpIconImage, 384);
-    lv_obj_align(nxpIconImage, LV_ALIGN_TOP_LEFT, 10, 0);
+    /* App text */
+    lv_obj_t * appText = lv_label_create(parent);
+    lv_obj_set_size(appText, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_align(appText, LV_ALIGN_TOP_LEFT, 0, 0);
+    lv_obj_add_style(appText, &gMediumTextStyle, LV_STATE_DEFAULT);
+    /* Adding \n to introduce new line in label */
+    lv_label_set_text(appText, "Basic Connected HMI\nApplication");
 
 #ifndef DISPLAY_MATTER_LOGS
-    /* Matter Icon */
-    lv_obj_t * MatterIconIimage = lv_img_create(parent);
-    lv_img_set_src(MatterIconIimage, &matterIcon);
-    lv_obj_set_size(MatterIconIimage, matterIcon.header.w, lv_pct(20));
-    lv_obj_align(MatterIconIimage, LV_ALIGN_TOP_RIGHT, 0, -5);
+    /* Matter Text */
+    lv_obj_t * matterText = lv_label_create(parent);
+    lv_obj_set_size(matterText, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_add_style(matterText, &gSmallTextStyle, LV_STATE_DEFAULT);
+    lv_label_set_text(matterText, "Matter(TM) ready");
+    lv_obj_align(matterText, LV_ALIGN_TOP_RIGHT,  0, 10);
 
     /* Info Container */
     lv_obj_t * InfoContainer = lv_obj_create(parent);
@@ -414,18 +467,19 @@ static void lv_create_infoCardWidgets(lv_obj_t * parent, const lv_img_dsc_t *ico
 static void lv_create_matterTab(lv_obj_t * parent)
 {
     lv_obj_add_style(parent, &gTabStyle, LV_STATE_DEFAULT);
-    /* Matter Icon */
-    lv_obj_t * MatterIconIimage = lv_img_create(parent);
-    lv_img_set_src(MatterIconIimage, &matterIcon);
-    lv_obj_set_size(MatterIconIimage, matterIcon.header.w, lv_pct(20));
-    lv_obj_align(MatterIconIimage, LV_ALIGN_TOP_LEFT, 0, 0);
+    /* Matter Text */
+    lv_obj_t * matterText = lv_label_create(parent);
+    lv_obj_set_size(matterText, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_add_style(matterText, &gSmallTextStyle, LV_STATE_DEFAULT);
+    lv_label_set_text(matterText, "Matter ready");
+    lv_obj_align(matterText, LV_ALIGN_TOP_LEFT, 0, 0);
 
     /* Title */
     lv_obj_t * titleLabel = lv_label_create(parent);
     lv_obj_set_size(titleLabel, LV_SIZE_CONTENT, lv_pct(20));
     lv_obj_add_style(titleLabel, &gLargeTextStyle, LV_STATE_DEFAULT);
     lv_label_set_text(titleLabel, "MATTER INFORMATION");
-    lv_obj_align_to(titleLabel, MatterIconIimage, LV_ALIGN_OUT_RIGHT_MID, 0, 5);
+    lv_obj_align_to(titleLabel, matterText, LV_ALIGN_OUT_RIGHT_MID, 0, 5);
 
     /* Info Container */
     lv_obj_t * InfoContainer = lv_obj_create(parent);

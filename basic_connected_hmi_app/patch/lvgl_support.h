@@ -1,18 +1,26 @@
 /*
- * Copyright 2019 NXP
+ * Copyright 2021 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _LVGL_SUPPORT_H_
-#define _LVGL_SUPPORT_H_
+#ifndef LVGL_SUPPORT_H
+#define LVGL_SUPPORT_H
 
 #include <stdint.h>
 
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
+#define DEMO_PANEL_RK043FN02H  0 /* RK043FN02H-CT */
+#define DEMO_PANEL_RK043FN66HS 1 /* RK043FN66HS-CTG */
+
+/* @TEST_ANCHOR */
+
+#ifndef DEMO_PANEL
+#define DEMO_PANEL DEMO_PANEL_RK043FN66HS
+#endif
 
 #define LCD_WIDTH             480
 #define LCD_HEIGHT            272
@@ -34,4 +42,4 @@ void lv_port_indev_init(void);
 }
 #endif
 
-#endif /* EXAMPLES_PLATFORM_NXP_RT1060_BOARD_LVGL_SUPPORT_H_ */
+#endif /*LVGL_SUPPORT_H */
